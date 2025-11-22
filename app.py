@@ -402,32 +402,25 @@ def get_user_details_by_id(user_id):
 
 @app.route("/products/<product_id>", methods=["GET"])
 def get_product_details(product_id):
-    """Return product details for a given product id. Currently returns a static sample for Murrah buffalo.
-    The `product_id` path parameter is returned in the payload's `id` field.
-    """
-    # Static product sample — replace with DB lookup if needed later
-    product = {
-        "id": product_id if product_id else "MURRAH-001",
-        "breed": "Murrah Buffalo",
-        "age": 3,
-        "milkYield": 12,
-        "price": 175000,
-        "inStock": True,
-        "insurance": 13000,
-        "buffalo_images": [
-            "https://storage.googleapis.com/markwave-kart/img1.jpeg",
-            "https://storage.googleapis.com/markwave-kart/img2.jpeg",
-            "https://storage.googleapis.com/markwave-kart/img3.jpeg",
-            "https://storage.googleapis.com/markwave-kart/img4.jpeg",
-        ],
-        "description": (
-            "The Murrah is a premium dairy buffalo known for its jet-black coat, strong build, "
-            "and curved horns. It is famous for high milk yield, rich fat content, and excellent "
-            "adaptability to different climates."
-        ),
-    }
-
-    return jsonify(product)
+    """Return product details for a given product id from Neo4j database."""
+    try:
+        driver = get_driver()
+        try:
+            with driver.session() as session:
+                result = session.run("MATCH (n:BUFFALO) WHERE n.id=$product_id RETURN n", product_id=product_id)
+                record = result.single()
+                
+                if not record:
+                    return jsonify({"statuscode": 404, "status": "error", "message": "Product not found"}), 404
+                
+                product_node = record["n"]
+                product_data = dict(product_node)
+                
+                return jsonify({"statuscode": 200, "status": "success", "product": product_data})
+        finally:
+            driver.close()
+    except Exception as e:
+        return jsonify({"statuscode": 500, "status": "error", "message": str(e)}), 500
 
 @app.route("/products", methods=["GET"])
 def get_products():
@@ -474,15 +467,12 @@ def verify_user():
                         elif isinstance(dob, Date):
                             user_props['dob'] = f"{dob.day:02d}-{dob.month:02d}-{dob.year}"
                     return jsonify({"statuscode": 200, "status": "success", "message": "User already verified", "user": user_props})
-                elif record and record["type"] == "new_referral":
+                elif record:
                     # Generate OTP
                     otp = str(random.randint(100000, 999999))
-                    # Update with device info and verified
-                    session.run(
-                        "MATCH (u:User {mobile: $mobile}) SET u.device_id = $device_id, u.device_model = $device_model",
-                        mobile=user_data['mobile'], device_id=user_data['device_id'], device_model=user_data['device_model']
-                    )
                     user_props = dict(record["user_props"])
+                    user_props['verified'] = False
+                    user_props['otp'] = otp
                     # Convert dob to dd-mm-yyyy string if present
                     if 'dob' in user_props:
                         dob = user_props['dob']
