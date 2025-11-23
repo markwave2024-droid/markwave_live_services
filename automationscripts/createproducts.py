@@ -65,7 +65,10 @@ def main():
                     p.inStock = product.inStock,
                     p.insurance = product.insurance,
                     p.buffalo_images = product.buffalo_images,
-                    p.description = product.description
+                    p.description = product.description,
+                    p.location = product.location,
+                    p.timestamp = product.timestamp
+                    
                 RETURN count(p) AS nodes_upserted
                 """,
                 products=products,

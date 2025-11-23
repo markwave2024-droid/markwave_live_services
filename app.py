@@ -342,8 +342,26 @@ def get_existing_customers():
         driver = get_driver()
         try:
             with driver.session() as session:
-                result = session.run("MATCH (u:User {verified:true}) RETURN u")
-                users = [dict(record["u"]) for record in result]
+                result = session.run("MATCH (u:User {verified:true}) RETURN u.id, u.mobile, u.name, u.verified, u.email, u.address, u.phone, u.city, u.state, u.pincode, u.occupation, u.income_level, u.family_size, u.referral_type")
+                users = [
+                    {
+                        "id": record["u.id"],
+                        "mobile": record["u.mobile"],
+                        "name": record["u.name"],
+                        "verified": record["u.verified"],
+                        "email": record["u.email"],
+                        "address": record["u.address"],
+                        "phone": record["u.phone"],
+                        "city": record["u.city"],
+                        "state": record["u.state"],
+                        "pincode": record["u.pincode"],
+                        "occupation": record["u.occupation"],
+                        "income_level": record["u.income_level"],
+                        "family_size": record["u.family_size"],
+                        "referral_type": record["u.referral_type"],
+                    }
+                    for record in result
+                ]
             return jsonify({"statuscode": 200, "status": "success", "users": users})
         finally:
             driver.close()
