@@ -40,7 +40,7 @@ def validate_user_create(data):
     if not data:
         return False, "No data provided"
     
-    required_fields = ['mobile', 'first_name', 'last_name', 'refered_by_mobile']
+    required_fields = ['mobile', 'first_name', 'last_name', 'refered_by_mobile','refered_by_name']
     for field in required_fields:
         if field not in data or not data[field]:
             return False, f"Missing required field: {field}"
