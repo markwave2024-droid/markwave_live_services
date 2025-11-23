@@ -10,7 +10,7 @@
   "health_status": "Healthy",
   "pregnancy_stage": "First (1st)",
   "age": 3,
-  "milk_yield_per_day_liters": 12,
+  "milkYield": 12,
   "buffalo_images": [
       "https://storage.googleapis.com/markwave-kart/productimages/murrah_1.jpeg",
       "https://storage.googleapis.com/markwave-kart/productimages/murrah_2.jpeg",

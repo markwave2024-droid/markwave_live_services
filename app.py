@@ -183,6 +183,7 @@ def favicon():
 def health_check():
     return jsonify({"status": "ok"})
 
+@app.route("/users", methods=["POST"])
 @app.route("/users/", methods=["POST"])
 def create_user():
     is_valid, error_message = validate_user_create(request.json)
