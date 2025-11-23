@@ -320,13 +320,15 @@ def get_new_referrals():
         driver = get_driver()
         try:
             with driver.session() as session:
-                result = session.run("MATCH (u:User {verified: false}) RETURN u.id, u.mobile, u.name, u.verified")
+                result = session.run("MATCH (u:User) WHERE u.verified = false OR u.verified is null RETURN u.id, u.mobile, u.first_name, u.last_name,u.refered_by_name,u.refered_by_mobile")
                 users = [
                     {
                         "id": record["u.id"],
                         "mobile": record["u.mobile"],
-                        "name": record["u.name"],
-                        "verified": record["u.verified"],
+                        "first_name": record["u.first_name"],
+                        "last_name": record["u.last_name"],
+                        "refered_by_name": record["u.refered_by_name"],
+                        "refered_by_mobile": record["u.refered_by_mobile"]
                     }
                     for record in result
                 ]
@@ -342,23 +344,17 @@ def get_existing_customers():
         driver = get_driver()
         try:
             with driver.session() as session:
-                result = session.run("MATCH (u:User {verified:true}) RETURN u.id, u.mobile, u.name, u.verified, u.email, u.address, u.phone, u.city, u.state, u.pincode, u.occupation, u.income_level, u.family_size, u.referral_type")
+                result = session.run("MATCH (u:User {verified:true}) RETURN u.id, u.mobile, u.first_name, u.last_name, u.isFormFilled, u.refered_by_name, u.refered_by_mobile, u.verified")
                 users = [
                     {
                         "id": record["u.id"],
                         "mobile": record["u.mobile"],
-                        "name": record["u.name"],
-                        "verified": record["u.verified"],
-                        "email": record["u.email"],
-                        "address": record["u.address"],
-                        "phone": record["u.phone"],
-                        "city": record["u.city"],
-                        "state": record["u.state"],
-                        "pincode": record["u.pincode"],
-                        "occupation": record["u.occupation"],
-                        "income_level": record["u.income_level"],
-                        "family_size": record["u.family_size"],
-                        "referral_type": record["u.referral_type"],
+                        "first_name": record["u.first_name"],
+                        "last_name": record["u.last_name"],
+                        "isFormFilled": record["u.isFormFilled"],
+                        "refered_by_name": record["u.refered_by_name"],
+                        "refered_by_mobile": record["u.refered_by_mobile"],
+                        "verified": record["u.verified"]
                     }
                     for record in result
                 ]

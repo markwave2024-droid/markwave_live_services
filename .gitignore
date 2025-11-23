@@ -1,2 +1,3 @@
 .env
 __pycache__/app.cpython-314.pyc
+.DS_Store
